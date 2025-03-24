@@ -7,11 +7,16 @@ from pathlib import Path
 
 def main():
     input_folder = Path("simulation_data")
+    Path("tex_files").mkdir(exist_ok=True)
     for file in input_folder.iterdir():
         if file.suffix == ".txt":
             print(f"reading simulation data from {file.stem}")
-            simulation_data = read_file(file)
-            create_tikz(simulation_data)
+            try:
+                simulation_data = read_file(file)
+                create_tikz(simulation_data)
+                print(f"Tex file created: {simulation_data.output_path}")
+            except Exception as ex:
+                print(f"Problem reading file {file.stem}. This file will be skipped. Error code: {ex}")
         else:
             print(f"{file.stem} is not a txt file and will be skipped")
 
@@ -22,8 +27,8 @@ def read_file(file_from_ngspice):
     set filetype=ascii
     wrdata yourfilename.txt vector to be plotted
     """
-    xvalues = []
-    yvalues = []
+    x_values = []
+    y_values = []
     with open(file_from_ngspice, "r") as input:
         for line in input:
             values = line.strip().split(" ")
@@ -31,9 +36,9 @@ def read_file(file_from_ngspice):
                 values.remove("")
             if len(values) < 2:
                 continue
-            xvalues.append(values[0])
-            yvalues.append(float(values[1]))
-    return SimulationData(file_from_ngspice, yvalues, int(xvalues[0].split("e")[-1]), int(xvalues[-1].split("e")[-1]))
+            x_values.append(values[0])
+            y_values.append(float(values[1]))
+    return SimulationData(file_from_ngspice, y_values, int(x_values[0].split("e")[-1]), int(x_values[-1].split("e")[-1]))
 
 
 def create_tikz(simulation_data):
@@ -41,9 +46,7 @@ def create_tikz(simulation_data):
     fig, ax = plt.subplots()
     ax.plot(x, simulation_data.y_values)
     ax.set_xscale("log")
-    output_path = os.path.join("tex_files", simulation_data.file_name.stem + ".tex")
-    print(output_path)
-    tikzplotlib.save(output_path)
+    tikzplotlib.save(simulation_data.output_path)
 
 
 def plot(simulation_data):
@@ -57,6 +60,7 @@ def plot(simulation_data):
 class SimulationData:
     def __init__(self, file_name, y_values, start_of_range, end_of_range):
         self.file_name = file_name
+        self.output_path = os.path.join("tex_files", file_name.stem + ".tex")
         self.y_values = y_values
         self.start_of_range = start_of_range
         self.end_of_range = end_of_range
@@ -64,31 +68,3 @@ class SimulationData:
 
 
 main()
-
-
-
-
-
-"""   
-def plot(file_from_ngspice):
-    xvalues = []
-    yvalues = []
-    with open(file_from_ngspice, "r") as input:
-        for line in input:
-            values = line.strip().split(" ")
-            while "" in values:
-                values.remove("")
-            if len(values) < 2:
-                continue
-            print(float(values[1]))
-            xvalues.append(float(values[0]))
-            yvalues.append(float(values[1]))
-    print(xvalues)
-    o = np.logspace(6, 10, 4001)
-    x = range(0, len(yvalues))
-    fig, ax = plt.subplots()
-    ax.plot(o, yvalues)
-    ax.set_xscale("log")
-    plt.show()
-    #tikzplotlib.save("test.tex")
-"""
