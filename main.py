@@ -92,7 +92,7 @@ def read_file_smith(file_from_ngspice):
     return SimulationData(file_from_ngspice, re_values, im_values)
 
 
-def create_tikz_dc(simulation_data):
+def create_tikz_lin(simulation_data):
     fig, ax = plt.subplots()
     ax.plot(simulation_data.x_values, simulation_data.y_values)
     tikzplotlib.save(simulation_data.output_path)
