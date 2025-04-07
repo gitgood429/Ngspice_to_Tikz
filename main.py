@@ -5,7 +5,8 @@ import os
 from pathlib import Path
 
 
-def main():
+def main(y_exponent=1):
+    #y_exponent e.g. 1e-3 for milli
     input_folder = Path("simulation_data")
     Path("tex_files").mkdir(exist_ok=True)
     for file in input_folder.iterdir():
@@ -18,11 +19,11 @@ def main():
                     print(f"DC Tex file created: {simulation_data.output_path}")
                 elif "dc" in file.stem.lower():
                     simulation_data = read_file_dc(file)
-                    create_tikz_dc(simulation_data)
+                    create_tikz_lin(simulation_data)
                     print(f"AC Tex file created: {simulation_data.output_path}")
                 elif "smith" in file.stem.lower():
                     simulation_data = read_file_smith(file)
-                    create_tikz_dc(simulation_data)
+                    create_tikz_lin(simulation_data)
                     print(f"Smith Tex file created: {simulation_data.output_path}")
                     print(r"Beware that the '\addplot' part of this file has to be inserted in a smith chart")
                 else:
@@ -33,7 +34,7 @@ def main():
             print(f"{file.stem} is not a txt file and will be skipped")
 
 
-def read_file_dc(file_from_ngspice):
+def read_file_dc(file_from_ngspice, y_exponent):
     """
     path to from Ngspice (Xschem) AC Simulation. Simulation command should include:
     set filetype=ascii
@@ -49,11 +50,11 @@ def read_file_dc(file_from_ngspice):
             if len(values) < 2:
                 continue
             x_values.append(float(values[0]))
-            y_values.append(float(values[1])*1e3)
+            y_values.append(float(values[1])/y_exponent)
     return SimulationData(file_from_ngspice, x_values, y_values)
 
 
-def read_file_ac(file_from_ngspice):
+def read_file_ac(file_from_ngspice, y_exponent):
     """
     path to from Ngspice (Xschem) AC Simulation. Simulation command should include:
     set filetype=ascii
@@ -69,7 +70,7 @@ def read_file_ac(file_from_ngspice):
             if len(values) < 2:
                 continue
             x_values.append(values[0])
-            y_values.append(float(values[1]))
+            y_values.append(float(values[1])/y_exponent)
     return SimulationData(file_from_ngspice, x_values, y_values, int(x_values[0].split("e")[-1]), int(x_values[-1].split("e")[-1]))
 
 def read_file_smith(file_from_ngspice):
