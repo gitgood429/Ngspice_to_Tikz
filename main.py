@@ -14,11 +14,11 @@ def main(y_exponent=1):
             print(f"reading simulation data from {file.stem}")
             try:
                 if "ac" in file.stem.lower():
-                    simulation_data = read_file_ac(file)
+                    simulation_data = read_file_ac(file, y_exponent)
                     create_tikz_log(simulation_data)
                     print(f"DC Tex file created: {simulation_data.output_path}")
                 elif "dc" in file.stem.lower():
-                    simulation_data = read_file_dc(file)
+                    simulation_data = read_file_dc(file, y_exponent)
                     create_tikz_lin(simulation_data)
                     print(f"AC Tex file created: {simulation_data.output_path}")
                 elif "smith" in file.stem.lower():
