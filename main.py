@@ -12,28 +12,28 @@ def main(y_exponent=1):
         raise FileNotFoundError(f"{input_folder} directory not found.")
     Path("tex_files").mkdir(exist_ok=True)
     for file in input_folder.iterdir():
-        if file.suffix == ".txt":
-            print(f"reading simulation data from {file.stem}")
-            try:
-                if "ac" in file.stem.lower():
-                    simulation_data = read_file_ac(file, y_exponent)
-                    create_tikz_log(simulation_data)
-                    print(f"DC Tex file created: {simulation_data.output_path}")
-                elif "dc" in file.stem.lower():
-                    simulation_data = read_file_dc(file, y_exponent)
-                    create_tikz_lin(simulation_data)
-                    print(f"AC Tex file created: {simulation_data.output_path}")
-                elif "smith" in file.stem.lower():
-                    simulation_data = read_file_smith(file)
-                    create_tikz_lin(simulation_data)
-                    print(f"Smith Tex file created: {simulation_data.output_path}")
-                    print(r"Beware that the '\addplot' part of this file has to be inserted in a smith chart")
-                else:
-                    print("please add 'dc', 'ac' or 'smith' to the filename to specify the plot type")
-            except Exception as ex:
-                print(f"Problem reading file {file.stem}. This file will be skipped. Error code: {ex}")
-        else:
+        if file.suffix != ".txt":
             print(f"{file.stem} is not a txt file and will be skipped")
+            continue
+        print(f"reading simulation data from {file.stem}")
+        try:
+            if "ac" in file.stem.lower():
+                simulation_data = read_file_ac(file, y_exponent)
+                create_tikz_log(simulation_data)
+                print(f"DC Tex file created: {simulation_data.output_path}")
+            elif "dc" in file.stem.lower():
+                simulation_data = read_file_dc(file, y_exponent)
+                create_tikz_lin(simulation_data)
+                print(f"AC Tex file created: {simulation_data.output_path}")
+            elif "smith" in file.stem.lower():
+                simulation_data = read_file_smith(file)
+                create_tikz_lin(simulation_data)
+                print(f"Smith Tex file created: {simulation_data.output_path}")
+                print(r"Beware that the '\addplot' part of this file has to be inserted in a smith chart")
+            else:
+                print("please add 'dc', 'ac' or 'smith' to the filename to specify the plot type")
+        except Exception as ex:
+            print(f"Problem reading file {file.stem}. This file will be skipped. Error code: {ex}")
 
 
 def read_file_dc(file_from_ngspice, y_exponent):
