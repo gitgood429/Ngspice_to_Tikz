@@ -8,6 +8,8 @@ from pathlib import Path
 def main(y_exponent=1):
     #y_exponent e.g. 1e-3 for milli
     input_folder = Path("simulation_data")
+    if not os.path.exists(input_folder):
+        raise FileNotFoundError(f"{input_folder} directory not found.")
     Path("tex_files").mkdir(exist_ok=True)
     for file in input_folder.iterdir():
         if file.suffix == ".txt":
