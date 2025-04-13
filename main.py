@@ -20,11 +20,11 @@ def main(y_exponent=1):
             if "ac" in file.stem.lower():
                 simulation_data = read_file_ac(file, y_exponent)
                 create_tikz_log(simulation_data)
-                print(f"DC Tex file created: {simulation_data.output_path}")
+                print(f"AC Tex file created: {simulation_data.output_path}")
             elif "dc" in file.stem.lower():
                 simulation_data = read_file_dc(file, y_exponent)
                 create_tikz_lin(simulation_data)
-                print(f"AC Tex file created: {simulation_data.output_path}")
+                print(f"DC Tex file created: {simulation_data.output_path}")
             elif "smith" in file.stem.lower():
                 simulation_data = read_file_smith(file)
                 create_tikz_lin(simulation_data)
@@ -46,9 +46,7 @@ def read_file_dc(file_from_ngspice, y_exponent):
     y_values = []
     with open(file_from_ngspice, "r") as input:
         for line in input:
-            values = line.strip().split(" ")
-            while "" in values:
-                values.remove("")
+            values = line.strip().split()
             if len(values) < 2:
                 continue
             x_values.append(float(values[0]))
@@ -66,9 +64,7 @@ def read_file_ac(file_from_ngspice, y_exponent):
     y_values = []
     with open(file_from_ngspice, "r") as input:
         for line in input:
-            values = line.strip().split(" ")
-            while "" in values:
-                values.remove("")
+            values = line.strip().split()
             if len(values) < 2:
                 continue
             x_values.append(values[0])
@@ -85,9 +81,7 @@ def read_file_smith(file_from_ngspice):
     im_values = []
     with open(file_from_ngspice, "r") as input:
         for line in input:
-            values = line.strip().split(" ")
-            while "" in values:
-                values.remove("")
+            values = line.strip().split()
             if len(values) < 2:
                 continue
             re_values.append(float(values[1]))
@@ -114,7 +108,7 @@ def plot_lin(simulation_data):
     not used, but useful for debugging, opens plot window
     """
     fig, ax = plt.subplots()
-    ax.plot(simulation_data.y_values, simulation_data.y_values)
+    ax.plot(simulation_data.x_values, simulation_data.y_values)
     plt.show()
 
 
